@@ -21,8 +21,9 @@ import keyboard
 # Variables for template Matching
 #################################################
 # Variables
-th = 0.8
+th = 0.75
 detected = None
+filtered_pts_templates = []
 
 # Button for Actions
 button = cv2.imread("resources/miner/mine_icon.png")
@@ -50,16 +51,19 @@ while(True):
         break
 
     var = 0
+    filtered_pts_templates = []
 
     screenshot = cv2.cvtColor(np.array(pg.screenshot()), cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
 
     if(detected):
-        print("minando")
-        time.sleep(7)
+        print("Comenzando minado")
+        time.sleep(11)
         detected = False
+        print("minado terminado, reiniciando proceso")
 
     else:
+        print("comenzando busqueda")
         for template in resorce_templates:
             res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
 
@@ -69,9 +73,27 @@ while(True):
                 h, w = template.shape  # Tamaño del template
                 center_x = pt[0] + w // 2
                 center_y = pt[1] + h // 2
-                print(center_x, center_y)
 
-                # Mueve el mouse al centro del match
+                if not utils.is_nearby(filtered_pts_templates, (center_x, center_y), min_distance=40):
+                    filtered_pts_templates.append((center_x, center_y))
+
+            for center_x, center_y in filtered_pts_templates:
+                print(center_x, center_y)
+                pg.moveTo(center_x, center_y, duration=0.2)
+                pg.click(button='right')
+
+                time.sleep(0.4)
+
+                screenshot = cv2.cvtColor(np.array(pg.screenshot()), cv2.COLOR_RGB2BGR)
+                gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+                action = mining_flow.mining_action(screenshot_gray=gray, button_template=template_gray)
+
+                if action:
+                    print("Action Button Detected")
+                    detected = True
+                    break
+
+                """ # Mueve el mouse al centro del match
                 pg.moveTo(center_x, center_y, duration=0.2)
 
                 # Clic derecho
@@ -87,16 +109,11 @@ while(True):
                     detected = True
                     break
                 else:
-                    continue
+                    continue """
                     
             if(detected):
-                print("Breaking for of mining points")
+                print("Breaking for of mining templates")
                 break
-        if(detected):
-                print("Breaking For of mining templates")
-                break
-    
-    time.sleep(1)
 
 
     if(var!= 0):

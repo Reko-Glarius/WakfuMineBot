@@ -1,4 +1,5 @@
 import os
+import math
 
 def get_professions_options():
     return {
@@ -23,3 +24,12 @@ def search_files_from_text(path, text): #, incluir_subcarpetas=True):
         #    break  # solo busca en el directorio principal si se desactiva la recursión
 
     return results
+
+
+# Función para verificar si un nuevo punto está muy cerca de los ya detectados
+def is_nearby(existing_points, new_point, min_distance=10):
+    for pt in existing_points:
+        dist = math.hypot(pt[0] - new_point[0], pt[1] - new_point[1])
+        if dist < min_distance:
+            return True
+    return False
