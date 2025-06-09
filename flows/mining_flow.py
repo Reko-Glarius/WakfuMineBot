@@ -1,5 +1,5 @@
-def get_mine_param_options():
-    return {
+def get_mine_starting_data():
+    return "miner", "",{
         1: "primitive_iron",
         2: "finest_sea_salt",
         3: "classic_coal",
